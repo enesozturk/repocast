@@ -1,0 +1,38 @@
+{
+  "name": "repocast",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Turn a repository or a pull request into a narrated architecture video.",
+  "bin": {
+    "repocast": "./src/cli.ts"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "setup": "bash scripts/setup.sh",
+    "layout": "node --experimental-strip-types src/cli.ts layout",
+    "voice": "node --env-file-if-exists=.env --experimental-strip-types src/cli.ts voice",
+    "render": "node --env-file-if-exists=.env --experimental-strip-types src/cli.ts render",
+    "build": "node --env-file-if-exists=.env --experimental-strip-types src/cli.ts build",
+    "studio": "remotion studio remotion/index.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@remotion/bundler": "4.0.400",
+    "@remotion/cli": "4.0.400",
+    "@remotion/lottie": "4.0.400",
+    "@remotion/renderer": "4.0.400",
+    "elkjs": "^0.10.0",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
+    "remotion": "4.0.400",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/react": "19.0.0",
+    "typescript": "^5.7.0"
+  }
+}

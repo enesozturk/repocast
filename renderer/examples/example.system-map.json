@@ -1,0 +1,78 @@
+{
+  "version": 1,
+  "project": {
+    "name": "Example — Orders",
+    "tagline": "A made-up service, here to document the file format"
+  },
+  "groups": [{ "id": "cloud", "label": "Cloud" }],
+  "nodes": [
+    {
+      "id": "web",
+      "label": "Storefront",
+      "kind": "client",
+      "tech": "browser",
+      "summary": "Where a customer places an order.",
+      "source": ["apps/storefront"]
+    },
+    {
+      "id": "api",
+      "label": "Orders API",
+      "kind": "service",
+      "tech": "HTTP service",
+      "group": "cloud",
+      "summary": "Accepts an order and writes it down before anything else happens.",
+      "source": ["services/orders/src"]
+    },
+    {
+      "id": "db",
+      "label": "Orders DB",
+      "kind": "datastore",
+      "tech": "Postgres",
+      "group": "cloud",
+      "summary": "The record of what was ordered and what state it is in.",
+      "source": ["services/orders/migrations"]
+    },
+    {
+      "id": "queue",
+      "label": "Fulfilment queue",
+      "kind": "queue",
+      "tech": "message queue",
+      "group": "cloud",
+      "summary": "Keeps the slow part off the request path.",
+      "source": ["services/orders/src/queue.ts"]
+    },
+    {
+      "id": "worker",
+      "label": "Fulfilment worker",
+      "kind": "service",
+      "tech": "background consumer",
+      "group": "cloud",
+      "summary": "Charges the card and marks the order paid.",
+      "source": ["services/fulfilment/src"]
+    },
+    {
+      "id": "psp",
+      "label": "Payment provider",
+      "kind": "external",
+      "tech": "third party",
+      "summary": "Takes the money. The one thing we do not control.",
+      "source": ["services/fulfilment/src/psp.ts"]
+    }
+  ],
+  "edges": [
+    { "id": "e-web-api", "from": "web", "to": "api", "kind": "http", "label": "POST /orders" },
+    { "id": "e-api-db", "from": "api", "to": "db", "kind": "db", "label": "insert" },
+    { "id": "e-api-queue", "from": "api", "to": "queue", "kind": "event", "label": "order placed" },
+    { "id": "e-queue-worker", "from": "queue", "to": "worker", "kind": "queue" },
+    { "id": "e-worker-psp", "from": "worker", "to": "psp", "kind": "rpc", "label": "charge" },
+    { "id": "e-worker-db", "from": "worker", "to": "db", "kind": "db", "label": "mark paid" }
+  ],
+  "flows": [
+    {
+      "id": "checkout",
+      "label": "Placing an order",
+      "summary": "The order is durable before the money moves.",
+      "path": ["e-web-api", "e-api-db", "e-api-queue", "e-queue-worker", "e-worker-psp", "e-worker-db"]
+    }
+  ]
+}

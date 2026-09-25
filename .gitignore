@@ -1,0 +1,5 @@
+node_modules
+.env
+renderer/out/
+renderer/public/
+.DS_Store

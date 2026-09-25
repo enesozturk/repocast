@@ -1,0 +1,41 @@
+{
+  "version": 1,
+  "voice": {
+    "provider": "elevenlabs",
+    "voiceId": "JBFqnCBsd6RMkjVDRZzb",
+    "modelId": "eleven_multilingual_v2",
+    "stability": 0.4,
+    "similarityBoost": 0.75,
+    "speed": 1
+  },
+  "scenes": [
+    {
+      "id": "s1-overview",
+      "narration": "This is Orders — the service behind a checkout button. Its whole job is to make an order durable before any money moves.",
+      "focus": { "nodes": [], "edges": [], "padding": 140 },
+      "beats": [{ "cue": "durable", "action": "highlight", "target": "db" }],
+      "holdSec": 0.8
+    },
+    {
+      "id": "s2-accept",
+      "narration": "A customer places an order and the API writes it straight to Postgres. Nothing slow happens on this path — it publishes an event and answers.",
+      "focus": { "nodes": ["web", "api", "db", "queue"], "edges": ["e-web-api", "e-api-db", "e-api-queue"], "padding": 130 },
+      "beats": [
+        { "cue": "Postgres", "action": "flow", "target": "e-api-db" },
+        { "cue": "event", "action": "flow", "target": "e-api-queue" }
+      ],
+      "holdSec": 0.9
+    },
+    {
+      "id": "s3-fulfil",
+      "narration": "The slow part runs behind a queue. A worker picks the order up, charges the card through the payment provider, and marks it paid.",
+      "focus": { "nodes": ["queue", "worker", "psp", "db"], "edges": ["e-queue-worker", "e-worker-psp", "e-worker-db"], "padding": 130 },
+      "beats": [
+        { "cue": "worker", "action": "highlight", "target": "worker" },
+        { "cue": "charges", "action": "flow", "target": "e-worker-psp" },
+        { "cue": "paid", "action": "flow", "target": "e-worker-db" }
+      ],
+      "holdSec": 1.2
+    }
+  ]
+}
